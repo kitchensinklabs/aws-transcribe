@@ -18,6 +18,10 @@ export type AVAILABLE_REGIONS =
  */
 export type LANGUAGES = "en-US" | "en-AU" | "en-GB" | "fr-CA" | "fr-FR" | "es-US"
 
+export type SPECIALTY = "PRIMARYCARE"
+
+export type TYPE = "CONVERSATION" | "DICTATION"
+
 export interface ClientConfig {
     accessKeyId?: string
     secretAccessKey?: string
@@ -28,6 +32,8 @@ export interface TranscribeStreamConfig {
     region: AVAILABLE_REGIONS
     languageCode: LANGUAGES
     sampleRate: number
+    specialty?: SPECIALTY
+    type?: TYPE
 }
 
 export interface PresignedUrlHeaders {
