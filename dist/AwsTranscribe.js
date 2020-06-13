@@ -12,6 +12,7 @@ var AwsTranscribe = (function () {
     function AwsTranscribe(config) {
         this.setAccessKeyId((config === null || config === void 0 ? void 0 : config.accessKeyId) || process.env.AWS_ACCESS_KEY_ID);
         this.setSecretAccessKey((config === null || config === void 0 ? void 0 : config.secretAccessKey) || process.env.AWS_SECRET_ACCESS_KEY);
+        this.setSessionToken((config === null || config === void 0 ? void 0 : config.sessionToken) || process.env.AWS_SESSION_TOKEN);
     }
     AwsTranscribe.prototype.createPreSignedUrl = function (config) {
         var region = config.region, languageCode = config.languageCode, sampleRate = config.sampleRate;
@@ -19,6 +20,7 @@ var AwsTranscribe = (function () {
         return aws_signature_v4_1.createPresignedURL("GET", endpoint, config.specialty ? "/medical-stream-transcription-websocket" : "/stream-transcription-websocket", "transcribe", crypto_1.default.createHash("sha256").update("", "utf8").digest("hex"), {
             key: this.accessKeyId,
             secret: this.secretAccessKey,
+            sessionToken: this.sessionToken,
             protocol: "wss",
             expires: 15,
             region: region,
@@ -38,6 +40,9 @@ var AwsTranscribe = (function () {
         if (validation_1.validateIsStringOtherwiseThrow(secretAccessKey, "secretAccessKey")) {
             this.secretAccessKey = secretAccessKey;
         }
+    };
+    AwsTranscribe.prototype.setSessionToken = function (sessionToken) {
+        this.sessionToken = sessionToken;
     };
     return AwsTranscribe;
 }());

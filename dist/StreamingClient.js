@@ -38,6 +38,7 @@ var StreamingClient = (function (_super) {
         _this.ws.addEventListener("message", _this._onmessage.bind(_this));
         _this.ws.addEventListener("error", _this._onerror.bind(_this));
         _this.ws.addEventListener("close", _this._onclose.bind(_this));
+        _this.cork();
         if (isBrowser) {
             _this.ws.binaryType = "arraybuffer";
         }
@@ -46,6 +47,7 @@ var StreamingClient = (function (_super) {
     StreamingClient.prototype._onopen = function () {
         debugLog("opened connection to aws transcribe");
         this.emit(StreamingClient.EVENTS.OPEN);
+        this.uncork();
     };
     StreamingClient.prototype.handleException = function (exception, type) {
         if (type === void 0) { type = "error"; }
