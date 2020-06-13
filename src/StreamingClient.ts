@@ -4,6 +4,7 @@ import { Writable } from "stream"
 import { createDebugger } from "./utils"
 import { TranscribeException } from "./TranscribeException"
 import { fromBinary, toBinary } from "./aws-message-utils"
+import { TranscriptEvent } from "."
 
 const debugLog = createDebugger(__filename)
 
@@ -30,6 +31,7 @@ export class StreamingClient extends Writable {
         this.ws.on("message", this._onmessage.bind(this))
         this.ws.on("error", this._onerror.bind(this))
         this.ws.on("close", this._onclose.bind(this))
+        this.cork()
     }
 
     /**
@@ -38,6 +40,7 @@ export class StreamingClient extends Writable {
     private _onopen() {
         debugLog(`opened connection to aws transcribe`)
         this.emit(StreamingClient.EVENTS.OPEN)
+        this.uncork()
     }
 
     /**
@@ -63,7 +66,7 @@ export class StreamingClient extends Writable {
         if (wrapper.headers[":message-type"].value === "event") {
             const eventType = wrapper.headers[":event-type"].value
             debugLog(`${eventType}: `, body)
-            this.emit(StreamingClient.EVENTS.DATA, body, eventType)
+            this.emit(StreamingClient.EVENTS.DATA, body as TranscriptEvent, eventType)
         } else {
             // message type is exception
             // exception type is supposed to be one from EXCEPTIONS
@@ -102,8 +105,7 @@ export class StreamingClient extends Writable {
     _write(chunk: any, _: string, cb: any) {
         const binary = toBinary(chunk)
 
-        this.ws.readyState === 1 && this.ws.send(binary)
-        cb()
+        this.ws.readyState === 1 && this.ws.send(binary, cb)
     }
 
     /**
